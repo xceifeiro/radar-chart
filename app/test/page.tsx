@@ -20,15 +20,22 @@ export default function TestPage() {
     setLoading(true)
     setError(null)
     try {
+      console.log("Testando /api/test...")
       const response = await fetch("/api/test", {
         method: "GET",
       })
 
+      console.log("Response status:", response.status)
+      console.log("Response ok:", response.ok)
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
 
       const data = await response.json()
+      console.log("Response data:", data)
+
       setResult({
         endpoint: "/api/test",
         status: response.status,
@@ -36,6 +43,7 @@ export default function TestPage() {
         data,
       })
     } catch (err) {
+      console.error("Erro no teste:", err)
       setError(`Erro /api/test: ${err}`)
     } finally {
       setLoading(false)
@@ -46,12 +54,16 @@ export default function TestPage() {
     setLoading(true)
     setError(null)
     try {
+      console.log("Testando GET /api/radar...")
       const response = await fetch("/api/radar", {
         method: "GET",
       })
 
+      console.log("Response status:", response.status)
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
 
       const data = await response.json()
@@ -62,6 +74,7 @@ export default function TestPage() {
         data,
       })
     } catch (err) {
+      console.error("Erro no teste:", err)
       setError(`Erro GET /api/radar: ${err}`)
     } finally {
       setLoading(false)
@@ -77,6 +90,8 @@ export default function TestPage() {
         data: [8, 6, 7, 5, 9, 4],
       }
 
+      console.log("Testando POST /api/radar com dados:", testData)
+
       const response = await fetch("/api/radar", {
         method: "POST",
         headers: {
@@ -84,6 +99,8 @@ export default function TestPage() {
         },
         body: JSON.stringify(testData),
       })
+
+      console.log("Response status:", response.status)
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -99,6 +116,7 @@ export default function TestPage() {
         responseData: data,
       })
     } catch (err) {
+      console.error("Erro no teste:", err)
       setError(`Erro POST /api/radar: ${err}`)
     } finally {
       setLoading(false)
@@ -108,7 +126,14 @@ export default function TestPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Teste da API Radar</h1>
+        <h1 className="text-3xl font-bold mb-8">Teste da API Radar - Versão Pages Router</h1>
+
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h2 className="font-semibold text-blue-800 mb-2">Status do Deploy</h2>
+          <p className="text-blue-700">
+            Mudamos para Pages Router (/pages/api/) para melhor compatibilidade com a Vercel.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
@@ -177,44 +202,25 @@ export default function TestPage() {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Informações de Debug</CardTitle>
+            <CardTitle>Links Diretos para Teste</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 text-sm">
-              <p>
-                <strong>URL base:</strong> {baseUrl || "Carregando..."}
-              </p>
-              <p>
-                <strong>Endpoints disponíveis:</strong>
-              </p>
-              <ul className="ml-4 space-y-1">
-                <li>• GET {baseUrl}/api/test</li>
-                <li>• GET {baseUrl}/api/radar</li>
-                <li>• POST {baseUrl}/api/radar</li>
-              </ul>
-              <p>
-                <strong>Links úteis:</strong>
-              </p>
-              <ul className="ml-4 space-y-1">
-                <li>
-                  •{" "}
-                  <a href="/" className="text-blue-600 hover:underline">
-                    Página principal
-                  </a>
-                </li>
-                <li>
-                  •{" "}
-                  <a href="/api/test" className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">
-                    Testar /api/test diretamente
-                  </a>
-                </li>
-                <li>
-                  •{" "}
-                  <a href="/api/radar" className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">
-                    Testar /api/radar diretamente
-                  </a>
-                </li>
-              </ul>
+            <div className="space-y-2">
+              <div>
+                <a href="/api/test" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                  🔗 {baseUrl}/api/test
+                </a>
+              </div>
+              <div>
+                <a href="/api/radar" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                  🔗 {baseUrl}/api/radar
+                </a>
+              </div>
+              <div>
+                <a href="/" className="text-blue-600 hover:underline">
+                  🏠 Página Principal
+                </a>
+              </div>
             </div>
           </CardContent>
         </Card>

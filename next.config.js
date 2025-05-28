@@ -9,8 +9,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Forçar uso do Pages Router para APIs
   experimental: {
-    serverComponentsExternalPackages: [],
+    appDir: true,
   },
   async headers() {
     return [
