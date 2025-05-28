@@ -77,7 +77,7 @@ export default function TestPage() {
   }
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen p-4 bg-gray-50">
       <Head>
         <title>Teste da API - Radar Chart</title>
         <meta name="description" content="Página de teste para a API de gráficos radar" />
@@ -85,7 +85,7 @@ export default function TestPage() {
       </Head>
 
       <main className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Teste da API - Versão Básica</h1>
+        <h1 className="text-3xl font-bold mb-6">Teste da API - Pages Router</h1>
 
         <div className="mb-6">
           <Link href="/">
@@ -97,60 +97,76 @@ export default function TestPage() {
           <button
             onClick={testHelloApi}
             disabled={loading}
-            className="p-4 border rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+            className="p-4 bg-white border rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 shadow-sm"
           >
-            {loading ? "Testando..." : "Testar API Hello"}
+            {loading ? "Testando..." : "🔗 Testar API Hello"}
           </button>
 
           <button
             onClick={testRadarApi}
             disabled={loading}
-            className="p-4 border rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+            className="p-4 bg-white border rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 shadow-sm"
           >
-            {loading ? "Testando..." : "Testar GET /api/radar"}
+            {loading ? "Testando..." : "🎯 Testar GET /api/radar"}
           </button>
 
           <button
             onClick={testRadarPostApi}
             disabled={loading}
-            className="p-4 border rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+            className="p-4 bg-white border rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 shadow-sm"
           >
-            {loading ? "Testando..." : "Testar POST /api/radar"}
+            {loading ? "Testando..." : "📤 Testar POST /api/radar"}
           </button>
         </div>
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <h2 className="font-semibold text-red-800 mb-2">Erro</h2>
+            <h2 className="font-semibold text-red-800 mb-2">❌ Erro</h2>
             <pre className="text-red-600 text-sm">{error}</pre>
           </div>
         )}
 
         {result && (
-          <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <h2 className="font-semibold mb-2">
-              Resultado: {result.endpoint} (Status: {result.status})
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <h2 className="font-semibold mb-2 text-green-800">
+              ✅ Resultado: {result.endpoint} (Status: {result.status})
             </h2>
-            <pre className="bg-white p-4 rounded border text-sm overflow-auto max-h-96">
+            <pre className="bg-gray-50 p-4 rounded border text-sm overflow-auto max-h-96">
               {JSON.stringify(result, null, 2)}
             </pre>
           </div>
         )}
 
         <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h2 className="font-semibold text-blue-800 mb-2">Links Diretos</h2>
+          <h2 className="font-semibold text-blue-800 mb-2">🔗 Links Diretos</h2>
           <ul className="space-y-2">
             <li>
               <a href="/api/hello" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                🔗 /api/hello
+                📋 /api/hello
               </a>
             </li>
             <li>
               <a href="/api/radar" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                🔗 /api/radar
+                🎯 /api/radar
               </a>
             </li>
           </ul>
+        </div>
+
+        <div className="mt-6 p-4 bg-gray-100 border border-gray-200 rounded-lg">
+          <h2 className="font-semibold mb-2">📋 Exemplo de curl</h2>
+          <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm">
+            <div className="mb-4">
+              <div className="text-yellow-400"># Teste GET</div>
+              <div>curl https://v0-radar-chart-generator.vercel.app/api/radar</div>
+            </div>
+            <div>
+              <div className="text-yellow-400"># Teste POST</div>
+              <div>curl -X POST https://v0-radar-chart-generator.vercel.app/api/radar \</div>
+              <div className="ml-2">-H "Content-Type: application/json" \</div>
+              <div className="ml-2">-d '{`{"labels":["Saúde","Carreira"],"data":[8,6]}`}'</div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

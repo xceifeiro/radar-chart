@@ -11,10 +11,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   swcMinify: true,
-  // Forçar uso do Pages Router para APIs
-  experimental: {
-    appDir: true,
-  },
+  // Remover experimental.appDir para usar apenas Pages Router
   async headers() {
     return [
       {
