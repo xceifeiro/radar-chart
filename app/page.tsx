@@ -16,6 +16,7 @@ export default function RadarChartGenerator() {
   const [labels, setLabels] = useState(["Saúde", "Carreira", "Relacionamentos", "Finanças", "Lazer", "Crescimento"])
   const [data, setData] = useState([8, 6, 7, 5, 9, 4])
   const [loading, setLoading] = useState(false)
+  const [apiResult, setApiResult] = useState<any>(null)
   const chartRef = useRef<ChartJS>(null)
 
   const chartData = {
@@ -92,6 +93,7 @@ export default function RadarChartGenerator() {
 
   const testApi = async () => {
     setLoading(true)
+    setApiResult(null)
     try {
       const response = await fetch("/api/radar", {
         method: "POST",
@@ -102,14 +104,18 @@ export default function RadarChartGenerator() {
       })
 
       const result = await response.json()
-      if (result.success) {
-        alert("API funcionando corretamente!")
-      } else {
-        alert(`Erro: ${result.error || "Erro desconhecido"}`)
-      }
+      setApiResult({
+        status: response.status,
+        success: response.ok,
+        data: result,
+      })
     } catch (error) {
       console.error("Erro:", error)
-      alert("Erro ao testar API")
+      setApiResult({
+        status: 0,
+        success: false,
+        error: error instanceof Error ? error.message : "Erro desconhecido",
+      })
     } finally {
       setLoading(false)
     }
@@ -121,6 +127,11 @@ export default function RadarChartGenerator() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Gerador de Gráfico Radar</h1>
           <p className="text-lg text-gray-600">Crie sua Roda da Vida personalizada</p>
+          <div className="mt-4">
+            <a href="/test" className="text-blue-600 hover:underline">
+              🔧 Página de Teste da API
+            </a>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -162,6 +173,17 @@ export default function RadarChartGenerator() {
                   Baixar Gráfico
                 </Button>
               </div>
+
+              {apiResult && (
+                <div
+                  className={`p-4 rounded-lg ${apiResult.success ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
+                >
+                  <h4 className={`font-semibold ${apiResult.success ? "text-green-800" : "text-red-800"}`}>
+                    Resultado da API (Status: {apiResult.status})
+                  </h4>
+                  <pre className="text-xs mt-2 overflow-auto max-h-32">{JSON.stringify(apiResult, null, 2)}</pre>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -178,28 +200,6 @@ export default function RadarChartGenerator() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Exemplo de uso da API */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Como usar a API</CardTitle>
-            <CardDescription>Endpoint para integração externa</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-              <div className="mb-2">
-                <span className="text-blue-400">POST</span> /api/radar
-              </div>
-              <div className="text-gray-300">
-                {`{
-  "labels": ["Saúde", "Carreira", "Relacionamentos", "Finanças", "Lazer", "Crescimento"],
-  "data": [8, 6, 7, 5, 9, 4]
-}`}
-              </div>
-              <div className="mt-2 text-yellow-400">Retorna: Configuração do gráfico em JSON</div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
