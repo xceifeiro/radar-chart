@@ -1,42 +1,71 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
+import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from "chart.js"
+import { Radar } from "react-chartjs-2"
+
+// Registrar componentes do Chart.js
+ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
 
 export default function RadarChartGenerator() {
   const [labels, setLabels] = useState(["Saúde", "Carreira", "Relacionamentos", "Finanças", "Lazer", "Crescimento"])
   const [data, setData] = useState([8, 6, 7, 5, 9, 4])
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const chartRef = useRef<ChartJS>(null)
 
-  const generateChart = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch("/api/radar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: "Roda da Vida",
+        data,
+        fill: true,
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        borderColor: "rgba(54, 162, 235, 1)",
+        pointBackgroundColor: "rgba(54, 162, 235, 1)",
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 2,
+        pointRadius: 5,
+      },
+    ],
+  }
+
+  const chartOptions = {
+    scales: {
+      r: {
+        min: 0,
+        max: 10,
+        ticks: {
+          stepSize: 1,
+          color: "#555",
+          backdropColor: "transparent",
         },
-        body: JSON.stringify({ labels, data }),
-      })
-
-      if (response.ok) {
-        const blob = await response.blob()
-        const url = URL.createObjectURL(blob)
-        setImageUrl(url)
-      } else {
-        alert("Erro ao gerar gráfico")
-      }
-    } catch (error) {
-      console.error("Erro:", error)
-      alert("Erro ao gerar gráfico")
-    } finally {
-      setLoading(false)
-    }
+        grid: {
+          color: "#ccc",
+        },
+        angleLines: {
+          color: "#888",
+        },
+        pointLabels: {
+          font: {
+            size: 14,
+          },
+          color: "#333",
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
   }
 
   const updateLabel = (index: number, value: string) => {
@@ -49,6 +78,41 @@ export default function RadarChartGenerator() {
     const newData = [...data]
     newData[index] = value[0]
     setData(newData)
+  }
+
+  const downloadChart = () => {
+    if (chartRef.current) {
+      const url = chartRef.current.toBase64Image("image/png", 1.0)
+      const link = document.createElement("a")
+      link.download = "roda-da-vida.png"
+      link.href = url
+      link.click()
+    }
+  }
+
+  const testApi = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/radar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ labels, data }),
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        alert("API funcionando corretamente!")
+      } else {
+        alert(`Erro: ${result.error || "Erro desconhecido"}`)
+      }
+    } catch (error) {
+      console.error("Erro:", error)
+      alert("Erro ao testar API")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -90,9 +154,14 @@ export default function RadarChartGenerator() {
                 </div>
               ))}
 
-              <Button onClick={generateChart} disabled={loading} className="w-full" size="lg">
-                {loading ? "Gerando..." : "Gerar Gráfico Radar"}
-              </Button>
+              <div className="flex gap-4">
+                <Button onClick={testApi} disabled={loading} className="flex-1">
+                  {loading ? "Testando..." : "Testar API"}
+                </Button>
+                <Button onClick={downloadChart} className="flex-1">
+                  Baixar Gráfico
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -103,30 +172,9 @@ export default function RadarChartGenerator() {
               <CardDescription>Visualização da sua Roda da Vida</CardDescription>
             </CardHeader>
             <CardContent>
-              {imageUrl ? (
-                <div className="text-center">
-                  <img
-                    src={imageUrl || "/placeholder.svg"}
-                    alt="Gráfico Radar"
-                    className="max-w-full h-auto rounded-lg shadow-lg"
-                  />
-                  <Button
-                    className="mt-4"
-                    onClick={() => {
-                      const link = document.createElement("a")
-                      link.href = imageUrl
-                      link.download = "roda-da-vida.png"
-                      link.click()
-                    }}
-                  >
-                    Baixar Imagem
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg">
-                  <p className="text-gray-500">Clique em "Gerar Gráfico Radar" para visualizar</p>
-                </div>
-              )}
+              <div className="bg-white p-4 rounded-lg">
+                <Radar ref={chartRef} data={chartData} options={chartOptions} />
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -148,7 +196,7 @@ export default function RadarChartGenerator() {
   "data": [8, 6, 7, 5, 9, 4]
 }`}
               </div>
-              <div className="mt-2 text-yellow-400">Retorna: Imagem PNG do gráfico radar</div>
+              <div className="mt-2 text-yellow-400">Retorna: Configuração do gráfico em JSON</div>
             </div>
           </CardContent>
         </Card>
