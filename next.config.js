@@ -11,7 +11,6 @@ const nextConfig = {
   },
   reactStrictMode: true,
   swcMinify: true,
-  // Remover experimental.appDir para usar apenas Pages Router
   async headers() {
     return [
       {
