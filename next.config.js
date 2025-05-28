@@ -9,6 +9,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  reactStrictMode: true,
+  swcMinify: true,
   // Forçar uso do Pages Router para APIs
   experimental: {
     appDir: true,
