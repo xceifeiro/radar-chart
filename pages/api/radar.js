@@ -1,6 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next"
-
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default function handler(req, res) {
   // Configurar CORS
   res.setHeader("Access-Control-Allow-Origin", "*")
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -63,7 +61,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     } catch (error) {
       res.status(500).json({
         error: "Erro interno do servidor",
-        details: error instanceof Error ? error.message : "Erro desconhecido",
+        details: error.message || "Erro desconhecido",
       })
       return
     }
